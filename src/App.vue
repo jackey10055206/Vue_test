@@ -1,28 +1,46 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="upload">
+    <p>讓我們來把你的照片變得更漂亮吧!</p>
+    <input type="file" ref="fileInput" @change="previewImage">
+    <br><br>
+    <div v-if = "imageUrl">
+      <img :src="imageUrl" style="max-width: 300px;">
+    </div>
+    <br><br>
+    <button @click="uploadImage">上傳照片</button>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from 'axios';
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      file: null,
+      imageUrl:null,
+    };
+  },
+  methods: {
+    previewImage(){
+      const file = this.$refs.fileInput.files[0];
+      this.file = file;
+      this.imageUrl = URL.createObjectURL(file);
+    },
+    uploadImage(){
+      const formData = new FormData();
+      formData.append('file',this.file);
+      axios.post('/api/upload',formData)
+        .then((res) => {
+          console.log("Success");
+          console.log(res.data);
+        })
+        .catch((error) => {
+          console.log("Fuck up")
+          console.log(error)
+        });
+    }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
